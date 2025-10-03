@@ -3,6 +3,7 @@ package uk.matvey.spoon;
 import info.movito.themoviedbapi.TmdbApi;
 import io.javalin.Javalin;
 import java.util.List;
+import static io.javalin.apibuilder.ApiBuilder.path;
 
 public class ServerModule {
 
@@ -10,7 +11,6 @@ public class ServerModule {
 
     public ServerModule(TmdbApi tmdbApi) {
         this.resources = List.of(
-            new HealthResource(),
             new MovieResource(tmdbApi.getMovies())
         );
     }
@@ -18,7 +18,11 @@ public class ServerModule {
     public Javalin javalinServer() {
         return Javalin.create(config -> {
             config.router.apiBuilder(() -> {
-                resources.forEach(Resource::register);
+                new HealthResource().register();
+
+                path("/api", () -> {
+                    resources.forEach(Resource::register);
+                });
             });
         });
     }

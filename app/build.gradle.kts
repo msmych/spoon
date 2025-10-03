@@ -9,6 +9,7 @@ repositories {
 dependencies {
     implementation(libs.javalin)
     implementation(libs.themoviedbapi)
+    implementation(libs.logback.classic)
 
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.assertj.core)

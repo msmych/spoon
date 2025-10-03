@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 public class FunctionalTestBase {
 
     private static final TmdbApi tmdbApi = new TmdbApi(System.getenv("TMDB_API_KEY"));
-    private static final Javalin server = new ServerModule(tmdbApi).javalinServer();
+    private static Javalin server;
 
     protected final HttpClient http = HttpClient.newBuilder().build();
 
@@ -28,6 +28,7 @@ public class FunctionalTestBase {
 
     @BeforeAll
     static void beforeAll() {
+        server = new ServerModule(tmdbApi).javalinServer();
         server.start(8080);
     }
 
