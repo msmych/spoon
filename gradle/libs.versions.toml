@@ -7,6 +7,8 @@ junit = "5.7.1"
 assertj = "3.11.1"
 themoviedbapi = "2.3.1"
 logback = "1.5.19"
+jackson = "3.0.0"
+jackson-datatype = "2.20.0"
 
 [libraries]
 javalin = { module = "io.javalin:javalin", version.ref = "javalin" }
@@ -15,3 +17,6 @@ junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 themoviedbapi = { module = "uk.co.conoregan:themoviedbapi", version.ref = "themoviedbapi" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+jackson-core = { module = "tools.jackson.core:jackson-core", version.ref = "jackson" }
+jackson-datatype-jdk8 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jdk8", version.ref = "jackson-datatype" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson-datatype" }

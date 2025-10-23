@@ -12,6 +12,21 @@
   "license": "MIT",
   "commands": [
     {
+      "name": "spoon-search",
+      "title": "Search movie",
+      "subtitle": "Search movies by title",
+      "description": "",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "Query",
+          "placeholder": "Query",
+          "type": "text",
+          "required": true
+        }
+      ]
+    },
+    {
       "name": "spoon-details",
       "title": "spoon-details",
       "subtitle": "Show movie details",
@@ -48,4 +63,3 @@
     "publish": "npx @raycast/api@latest publish"
   }
 }
-
