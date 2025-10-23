@@ -1,5 +1,6 @@
 plugins {
     application
+    alias(libs.plugins.shadow)
 }
 
 repositories {
@@ -21,4 +22,12 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+application {
+    mainClass.set("uk.matvey.spoon.App")
+}
+
+tasks.shadowJar {
+    archiveBaseName.set("app")
 }
