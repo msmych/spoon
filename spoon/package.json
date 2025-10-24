@@ -14,13 +14,13 @@
     {
       "name": "spoon-search",
       "title": "Search movie",
-      "subtitle": "Search movies by title",
+      "subtitle": "Search movie by title",
       "description": "",
       "mode": "view",
       "arguments": [
         {
           "name": "Query",
-          "placeholder": "Query",
+          "placeholder": "Perfect Days",
           "type": "text",
           "required": true
         }

@@ -1,6 +1,7 @@
-import { Detail, useNavigation, open } from "@raycast/api"
+import { Detail, useNavigation, open, ActionPanel, Action } from "@raycast/api"
 import { useEffect, useState } from "react"
 import DirectorMovies from "./director-movies"
+import { Director } from "./types/movie-types"
 
 interface MovieDetails {
   id: number
@@ -15,11 +16,6 @@ interface MovieDetails {
   directors: Director[]
   genres: string[]
   links: Map<string, URL>
-}
-
-interface Director {
-  id: number
-  name: string
 }
 
 export default function MovieDetails(props: { movieId: number }) {
@@ -37,11 +33,13 @@ export default function MovieDetails(props: { movieId: number }) {
 
   const { push } = useNavigation()
 
+  const handleGoToDirectorMovies = (director: Director) => push(<DirectorMovies director={director} />)
+
   return (
     <Detail
       isLoading={!movie}
-      navigationTitle={movie?.title ?? "No title"}
-      markdown={movie ? movieDetailsMd(movie) : "# Loading..."}
+      navigationTitle={movie?.title}
+      markdown={movie && movieDetailsMd(movie)}
       metadata={
         movie && (
           <Detail.Metadata>
@@ -50,14 +48,14 @@ export default function MovieDetails(props: { movieId: number }) {
                 <Detail.Metadata.TagList.Item
                   key={director.id}
                   text={director.name}
-                  onAction={() => push(<DirectorMovies directorId={director.id} directorName={director.name} />)}
+                  onAction={() => handleGoToDirectorMovies(director)}
                 />
               ))}
             </Detail.Metadata.TagList>
             {movie.releaseDate && (
               <Detail.Metadata.Label
                 title="Release date"
-                text={`${new Date(movie.releaseDate).toLocaleDateString()}`}
+                text={`${new Date(movie.releaseDate).toLocaleDateString(undefined, { dateStyle: "medium" })}`}
               />
             )}
             <Detail.Metadata.Label title="Run time" text={movie.runTime} />
@@ -71,6 +69,17 @@ export default function MovieDetails(props: { movieId: number }) {
           </Detail.Metadata>
         )
       }
+      actions={
+        movie && (
+          <ActionPanel>
+            <Action.Push
+              title={`Directed by ${movie.directors[0].name}`}
+              target={<DirectorMovies director={movie.directors[0]} />}
+              shortcut={{ modifiers: ["cmd"], key: "d" }}
+            />
+          </ActionPanel>
+        )
+      }
     />
   )
 }
@@ -78,7 +87,7 @@ export default function MovieDetails(props: { movieId: number }) {
 function movieDetailsMd(movie: MovieDetails): string {
   const backdrop = movie.backdropUrl ? `![Backdrop](${movie.backdropUrl})` : ""
   const tagline = movie.tagline ? `_${movie.tagline}_` : ""
-  const originalTitle = movie.originalTitle ? `## ${movie.originalTitle}` : ""
+  const originalTitle = movie.originalTitle ? `## _${movie.originalTitle}_` : ""
   return `
 ${backdrop}
 ${tagline}

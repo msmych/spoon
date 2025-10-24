@@ -19,13 +19,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments.SpoonS
 
   useEffect(() => {
     async function fetchSearch(q: string) {
-      let rs: Response | null = null
-      for (let i = 0; i < 5; i++) {
-        rs = await fetch(`http://localhost:8080/api/movies/search?q=${q}`)
-        if (rs.status === 200) {
-          break
-        }
-      }
+      const rs = await fetch(`http://localhost:8080/api/movies/search?q=${q}`)
       const json = await rs?.json()
       setMovies(json as MovieSearchResultItem[])
     }
@@ -40,14 +34,14 @@ export default function Command(props: LaunchProps<{ arguments: Arguments.SpoonS
       {movies &&
         movies.map((movie) => {
           const posterImage = movie.posterUrl ? `![Poster](${movie.posterUrl}?raycast-height=256)` : ""
-          const originalTitle = movie.originalTitle ? `## ${movie.originalTitle}` : ""
+          const originalTitle = movie.originalTitle ? `## _${movie.originalTitle}_` : ""
           return (
             <List.Item
               id={movie.id.toString()}
               key={movie.id}
               title={{ value: movie.title, tooltip: movie.originalTitle }}
               subtitle={movie.releaseDate && new Date(movie.releaseDate).getFullYear().toString()}
-              icon={movie.tinyPosterUrl?.toString() ?? Icon.CircleDisabled}
+              icon={movie.tinyPosterUrl?.toString() ?? Icon.BlankDocument}
               detail={
                 <List.Item.Detail
                   markdown={`
