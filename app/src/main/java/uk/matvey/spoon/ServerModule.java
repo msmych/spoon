@@ -8,6 +8,7 @@ import info.movito.themoviedbapi.TmdbApi;
 import io.javalin.Javalin;
 import io.javalin.json.JavalinJackson;
 import java.util.List;
+import uk.matvey.spoon.director.DirectorResource;
 import uk.matvey.spoon.movie.MovieResource;
 import uk.matvey.spoon.movie.search.MovieSearchResource;
 import static io.javalin.apibuilder.ApiBuilder.path;
@@ -23,7 +24,8 @@ public class ServerModule {
 
     public ServerModule(TmdbApi tmdbApi) {
         this.resources = List.of(
-            new MovieResource(new MovieSearchResource(tmdbApi.getSearch()), tmdbApi.getMovies())
+            new MovieResource(new MovieSearchResource(tmdbApi.getSearch()), tmdbApi.getMovies()),
+            new DirectorResource(tmdbApi.getPeople())
         );
     }
 

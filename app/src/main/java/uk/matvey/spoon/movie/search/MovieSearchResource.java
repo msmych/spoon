@@ -28,7 +28,7 @@ public class MovieSearchResource implements Resource {
                     final var releaseDate = Optional.of(item.getReleaseDate()).filter(rd -> !rd.isBlank())
                         .map(LocalDate::parse);
                     final var posterUrl = Optional.ofNullable(item.getPosterPath())
-                        .map(pp -> URI.create("https://image.tmdb.org/t/p/w185" + pp));
+                        .map(pp -> URI.create("https://image.tmdb.org/t/p/w342" + pp));
                     final var tinyPosterUrl = Optional.ofNullable(item.getPosterPath())
                         .map(pp -> URI.create("https://image.tmdb.org/t/p/w92" + pp));
                     return new MovieSearchResultItem(item.getId(),

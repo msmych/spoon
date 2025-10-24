@@ -1,5 +1,6 @@
-import { LaunchProps, List } from "@raycast/api"
+import { Action, ActionPanel, Icon, LaunchProps, List } from "@raycast/api"
 import { useEffect, useState } from "react"
+import MovieDetails from "./movie-details"
 
 interface MovieSearchResultItem {
   id: number
@@ -14,13 +15,18 @@ interface MovieSearchResultItem {
 export default function Command(props: LaunchProps<{ arguments: Arguments.SpoonSearch }>) {
   const initialQuery = (props.arguments as any).Query
   const [query, setQuery] = useState<string>(initialQuery)
-  const [movies, setMovies] = useState<MovieSearchResultItem[]>([])
+  const [movies, setMovies] = useState<MovieSearchResultItem[] | null>(null)
 
   useEffect(() => {
     async function fetchSearch(q: string) {
-      const rs = await fetch(`http://localhost:8080/api/movies/search?q=${q}`)
-      const json = await rs.json()
-      console.log(json)
+      let rs: Response | null = null
+      for (let i = 0; i < 5; i++) {
+        rs = await fetch(`http://localhost:8080/api/movies/search?q=${q}`)
+        if (rs.status === 200) {
+          break
+        }
+      }
+      const json = await rs?.json()
       setMovies(json as MovieSearchResultItem[])
     }
 
@@ -30,29 +36,36 @@ export default function Command(props: LaunchProps<{ arguments: Arguments.SpoonS
   }, [query])
 
   return (
-    <List isShowingDetail searchText={query} onSearchTextChange={setQuery} throttle={true}>
-      {movies.map((movie) => {
-        const posterImage = movie.posterUrl ? `![Poster](${movie.posterUrl})` : ""
-        return (
-          <List.Item
-            id={movie.id.toString()}
-            title={movie.title}
-            subtitle={movie.releaseDate && new Date(movie.releaseDate).getFullYear().toString()}
-            icon={movie.tinyPosterUrl?.toString()}
-            detail={
-              <List.Item.Detail
-                markdown={`
+    <List isShowingDetail isLoading={!movies} searchText={query} onSearchTextChange={setQuery} throttle={true}>
+      {movies &&
+        movies.map((movie) => {
+          const posterImage = movie.posterUrl ? `![Poster](${movie.posterUrl}?raycast-height=256)` : ""
+          const originalTitle = movie.originalTitle ? `## ${movie.originalTitle}` : ""
+          return (
+            <List.Item
+              id={movie.id.toString()}
+              key={movie.id}
+              title={{ value: movie.title, tooltip: movie.originalTitle }}
+              subtitle={movie.releaseDate && new Date(movie.releaseDate).getFullYear().toString()}
+              icon={movie.tinyPosterUrl?.toString() ?? Icon.CircleDisabled}
+              detail={
+                <List.Item.Detail
+                  markdown={`
 ${posterImage}
-
 # ${movie.title}
-
+${originalTitle}
 ${movie.overview}
 `}
-              />
-            }
-          />
-        )
-      })}
+                />
+              }
+              actions={
+                <ActionPanel>
+                  <Action.Push key={movie.id} title={movie.title} target={<MovieDetails movieId={movie.id} />} />
+                </ActionPanel>
+              }
+            />
+          )
+        })}
     </List>
   )
 }
