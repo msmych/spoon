@@ -1,6 +1,7 @@
 import { Action, ActionPanel, Icon, LaunchProps, List } from "@raycast/api"
 import { useEffect, useState } from "react"
 import MovieDetails from "./movie-details"
+import { config } from "./config"
 
 interface MovieSearchResultItem {
   id: number
@@ -19,7 +20,7 @@ export default function Command(props: LaunchProps<{ arguments: Arguments.SpoonS
 
   useEffect(() => {
     async function fetchSearch(q: string) {
-      const rs = await fetch(`http://localhost:8080/api/movies/search?q=${q}`)
+      const rs = await fetch(`${config.apiBaseUrl}/movies/search?q=${q}`)
       const json = await rs?.json()
       setMovies(json as MovieSearchResultItem[])
     }

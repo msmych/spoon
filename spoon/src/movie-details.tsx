@@ -2,6 +2,7 @@ import { Detail, useNavigation, open, ActionPanel, Action } from "@raycast/api"
 import { useEffect, useState } from "react"
 import DirectorMovies from "./director-movies"
 import { Director } from "./types/movie-types"
+import { config } from "./config"
 
 interface MovieDetails {
   id: number
@@ -16,6 +17,12 @@ interface MovieDetails {
   directors: Director[]
   genres: string[]
   links: Map<string, URL>
+  youTubeVideos: YouTubeVideo[]
+}
+
+interface YouTubeVideo {
+  type: string
+  url: URL
 }
 
 export default function MovieDetails(props: { movieId: number }) {
@@ -23,8 +30,9 @@ export default function MovieDetails(props: { movieId: number }) {
 
   useEffect(() => {
     async function fetchMovieDetails(movieId: number) {
-      const rs = await fetch(`http://localhost:8080/api/movies/${movieId}`)
+      const rs = await fetch(`${config.apiBaseUrl}/movies/${movieId}`)
       const json = await rs.json()
+      console.log(json)
       setMovie(json as MovieDetails)
     }
 
@@ -59,8 +67,15 @@ export default function MovieDetails(props: { movieId: number }) {
               />
             )}
             <Detail.Metadata.Label title="Run time" text={movie.runTime} />
-            <Detail.Metadata.Separator />
             <Detail.Metadata.Label title="Genres" text={movie.genres.join(", ")} />
+            <Detail.Metadata.Separator />
+            {movie.youTubeVideos.length > 0 && (
+              <Detail.Metadata.TagList title="Videos">
+                {movie.youTubeVideos.map(({ url, type }, index) => {
+                  return <Detail.Metadata.TagList.Item key={index} text={type} onAction={() => open(url.toString())} />
+                })}
+              </Detail.Metadata.TagList>
+            )}
             <Detail.Metadata.TagList title="Links">
               {Object.entries(movie.links).map(([k, v]) => (
                 <Detail.Metadata.TagList.Item key={k} text={k} onAction={() => open(v)} />
@@ -72,6 +87,7 @@ export default function MovieDetails(props: { movieId: number }) {
       actions={
         movie && (
           <ActionPanel>
+            <Action.OpenInBrowser title="Open on TMDb" url={(movie.links as any).TMDb} />
             <Action.Push
               title={`Directed by ${movie.directors[0].name}`}
               target={<DirectorMovies director={movie.directors[0]} />}

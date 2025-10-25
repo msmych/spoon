@@ -2,6 +2,7 @@ package uk.matvey.spoon.movie;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import info.movito.themoviedbapi.model.core.NamedIdElement;
+import info.movito.themoviedbapi.model.core.video.Video;
 import info.movito.themoviedbapi.model.movies.Credits;
 import info.movito.themoviedbapi.model.movies.MovieDb;
 import java.net.URI;
@@ -10,8 +11,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+import static java.util.stream.Collectors.toUnmodifiableMap;
 
 public record MovieDetails(
     int id,
@@ -26,10 +28,14 @@ public record MovieDetails(
     Optional<URI> backdropUrl,
     Optional<List<Director>> directors,
     List<String> genres,
-    Map<String, URI> links
+    Map<String, URI> links,
+    List<YouTubeVideo> youTubeVideos
 ) {
 
     public record Director(int id, String name) {
+    }
+
+    public record YouTubeVideo(String type, URI url) {
     }
 
     public static MovieDetails from(MovieDb movieDb) {
@@ -51,6 +57,11 @@ public record MovieDetails(
                 .toList());
         final var runTimeMinutes = Duration.ofMinutes(movieDb.getRuntime());
         final var runTime = String.format("%d:%02d", runTimeMinutes.toHoursPart(), runTimeMinutes.toMinutesPart());
+        final var trailers = StreamSupport.stream(movieDb.getVideos().spliterator(), false)
+            .filter(video -> video.getSite().equals("YouTube"))
+            .filter(Video::getOfficial)
+            .map(video -> new YouTubeVideo(video.getType(), URI.create("https://youtube.com/watch?v=" + video.getKey())))
+            .toList();
         return new MovieDetails(
             movieDb.getId(),
             title,
@@ -68,7 +79,8 @@ public record MovieDetails(
                     Map.entry("IMDb", Optional.ofNullable(movieDb.getImdbID()).map(imdbId -> URI.create("https://www.imdb.com/title/" + imdbId)).orElse(null))
                 )
                 .filter(e -> e.getValue() != null)
-                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue))
+                .collect(toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)),
+            trailers
         );
     }
 }

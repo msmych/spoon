@@ -26,7 +26,7 @@ public class MovieResource implements Resource {
             movieSearchResource.register();
             get("/{id}", ctx -> {
                 final var movieId = Integer.parseInt(ctx.pathParam("id"));
-                final var movieDb = tmdbMovies.getDetails(movieId, "en-US", MovieAppendToResponse.CREDITS);
+                final var movieDb = tmdbMovies.getDetails(movieId, "en-US", MovieAppendToResponse.CREDITS, MovieAppendToResponse.VIDEOS);
                 ctx.json(MovieDetails.from(movieDb));
             });
         });

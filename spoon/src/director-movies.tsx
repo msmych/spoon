@@ -2,6 +2,7 @@ import { Action, ActionPanel, Grid, Icon } from "@raycast/api"
 import { useEffect, useState } from "react"
 import MovieDetails from "./movie-details"
 import { Director } from "./types/movie-types"
+import { config } from "./config"
 
 interface MovieItem {
   id: number
@@ -16,7 +17,7 @@ export default function DirectorMovies(props: { director: Director }) {
 
   useEffect(() => {
     async function fetchMovies(directorId: number) {
-      const rs = await fetch(`http://localhost:8080/api/directors/${directorId}/movies`)
+      const rs = await fetch(`${config.apiBaseUrl}/directors/${directorId}/movies`)
       const json = await rs.json()
       setMovies(json as MovieItem[])
     }
